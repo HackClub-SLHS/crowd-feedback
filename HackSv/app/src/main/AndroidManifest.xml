@@ -24,6 +24,10 @@
             android:name=".VoteActivity"
             android:label="@string/title_activity_vote" >
         </activity>
+        <activity
+            android:name=".ViewActivity"
+            android:label="@string/title_activity_view" >
+        </activity>
     </application>
 
 </manifest>
