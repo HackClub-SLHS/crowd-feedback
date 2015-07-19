@@ -44,6 +44,7 @@ public class Server {
         String[] bit2 = {"pic2", sPic2};
         String[] mail = {"email", email};
 
+        Log.i("Test","1");
         new SendPostRequest().execute(host, opt1, opt2, qus, mail, bit1, bit2);
 
     }
