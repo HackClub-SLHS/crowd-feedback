@@ -77,8 +77,7 @@
             android:text="Create"
             android:id="@+id/create"
             android:layout_gravity="center_horizontal"
-            android:background="#2979FF"
-            android:backgroundTint="#82B1FF" />
+            android:background="#82B1FF" />
 
     </LinearLayout>
 

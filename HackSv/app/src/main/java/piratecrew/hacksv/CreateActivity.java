@@ -1,11 +1,15 @@
 package piratecrew.hacksv;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -22,7 +26,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.Runnable;
 import piratecrew.hacksv.utils.Server;
 
@@ -46,8 +53,8 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         bitmap = null;
         if (resultCodeRun == RESULT_OK) {
             if (requestCodeRun ==1) {   //took a photo
-                bitmap = (Bitmap) extras.get("data");
-                    imageToSet.setImageBitmap(Bitmap.createScaledBitmap(bitmap, (int)(width*((bitmap.getWidth()*height*.29)/(bitmap.getHeight()*width))), (int) (height*.29), false));
+                bitmap = Bitmap.createScaledBitmap((Bitmap) extras.get("data"), (int) (width * ((((Bitmap) extras.get("data")).getWidth() * height * .29) / (((Bitmap) extras.get("data")).getHeight() * width))), (int) (height * .29), false);
+                    imageToSet.setImageBitmap(bitmap);
 
                     //TODO: find why to use this code
                    /* OutputStream outFile = null;
@@ -78,7 +85,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 String picturePath = cursor.getString(columnIndex);
                 cursor.close();
-                bitmap = (BitmapFactory.decodeFile(picturePath));
+                bitmap = (Bitmap.createScaledBitmap((BitmapFactory.decodeFile(picturePath)), (int) (width * (((BitmapFactory.decodeFile(picturePath)).getWidth() * height * .29) / ((BitmapFactory.decodeFile(picturePath)).getHeight() * width))), (int) (height * .29), false));
 
                 //TODO: find why to use this code
                 /*OutputStream compressThumbnail = null;
@@ -89,7 +96,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
                 }
                 thumbnail.compress(Bitmap.CompressFormat.JPEG,85,compressThumbnail); //use to compress the display image
                 Log.w("image path:", picturePath + "");*/
-                imageToSet.setImageBitmap(Bitmap.createScaledBitmap(bitmap, (int) (width * ((bitmap.getWidth() * height * .29) / (bitmap.getHeight() * width))), (int) (height * .29), false));
+                imageToSet.setImageBitmap(bitmap);
 
             }
         }
@@ -113,11 +120,19 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (null != actionBar) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay()
                 .getMetrics(metrics);
         width = metrics.widthPixels;
         height = metrics.heightPixels;
+
 
         textTop = (EditText) findViewById(R.id.editTextTop);
         textBottom = (EditText) findViewById(R.id.editTextBottom);
@@ -129,6 +144,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         bottom = (ImageButton) findViewById(R.id.imageViewBottom);
 
         Drawable upload = (ResourcesCompat.getDrawable(getResources(), R.drawable.uploadphoto, null));
+
 
         if (bit1 == null)(top).setImageBitmap((Bitmap.createScaledBitmap(((BitmapDrawable) (upload)).getBitmap(), (int) (width * ((578) * height * .29) / (321 * width)), (int) (height * .29), false)));
         if (bit2 == null)(bottom).setImageBitmap((Bitmap.createScaledBitmap(((BitmapDrawable) (upload)).getBitmap(), (int) (width * ((578) * height * .29) / (321 * width)), (int) (height * .29), false)));
@@ -181,14 +197,14 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
                 switch (item) {
                     //Take a photo
                     case 0:
-                         intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(intent, 1);
                         resultCodeRun = RESULT_OK;
                         requestCodeRun = 1;
                         break;
                     //Chose a photo from gallery
                     case 1:
-                        Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                         resultCodeRun = RESULT_OK;
                         requestCodeRun = 2;
                         startActivityForResult(i, 2);
@@ -203,9 +219,19 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_create, menu);
+
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home: startActivity(new Intent(CreateActivity.this, MainActivity.class));
+        }
+        return (super.onOptionsItemSelected(menuItem));
     }
 
     @Override
@@ -221,18 +247,5 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
