@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,7 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.lang.Runnable;
@@ -26,25 +29,25 @@ import piratecrew.hacksv.utils.Server;
 public class CreateActivity extends AppCompatActivity implements Runnable{
 
     int requestCodeRun, resultCodeRun;
-    Intent dataRun;
     Button create;
     EditText textTop, textCenter, textBottom;
-    Bitmap bit1, bit2;
+    Bitmap bitmap, bit1, bit2;
     Bundle extras;
-    int imageToSet;
+    ImageButton imageToSet;
     DisplayMetrics metrics;
     int width;
     int height;
     Uri selectedImage;
-
+    ImageButton top;
+    ImageButton bottom;
 
     @Override
     public void run() {
-        Bitmap bitmap = null;
+        bitmap = null;
         if (resultCodeRun == RESULT_OK) {
             if (requestCodeRun ==1) {   //took a photo
                 bitmap = (Bitmap) extras.get("data");
-                    ((ImageView) findViewById(imageToSet)).setImageBitmap(Bitmap.createScaledBitmap(bitmap, (int)(width*((bitmap.getWidth()*height*.3)/(bitmap.getHeight()*width))), (int) (height*.3), false));
+                    imageToSet.setImageBitmap(Bitmap.createScaledBitmap(bitmap, (int)(width*((bitmap.getWidth()*height*.29)/(bitmap.getHeight()*width))), (int) (height*.29), false));
 
                     //TODO: find why to use this code
                    /* OutputStream outFile = null;
@@ -86,19 +89,17 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
                 }
                 thumbnail.compress(Bitmap.CompressFormat.JPEG,85,compressThumbnail); //use to compress the display image
                 Log.w("image path:", picturePath + "");*/
-                ((ImageView) findViewById(imageToSet)).setImageBitmap(Bitmap.createScaledBitmap(bitmap, (int)(width*((bitmap.getWidth()*height*.3)/(bitmap.getHeight()*width))), (int) (height*.3), false));
+                imageToSet.setImageBitmap(Bitmap.createScaledBitmap(bitmap, (int) (width * ((bitmap.getWidth() * height * .29) / (bitmap.getHeight() * width))), (int) (height * .29), false));
 
             }
         }
-        if (imageToSet == R.id.imageViewTop){
+        if (imageToSet == top){
+            if (bit1!=null)bit1.recycle();
             bit1 = bitmap;
-            bitmap.recycle();
-            selectImage(R.id.imageViewBottom, false);
         }
         else{
+            if(bit2!=null)bit2.recycle();
             bit2 = bitmap;
-            bitmap.recycle();
-            Server.createPoll(textCenter.getText().toString(),textTop.getText().toString(),textBottom.getText().toString(),bit1,bit2);
         }
          Log.i("Running", "Thread is running");
     }
@@ -122,34 +123,53 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         textBottom = (EditText) findViewById(R.id.editTextBottom);
         textCenter = (EditText) findViewById(R.id.editTextCenter);
         create = (Button) findViewById(R.id.create);
+
+        top = (ImageButton) findViewById(R.id.imageViewTop);
+        bottom = (ImageButton) findViewById(R.id.imageViewBottom);
+
+        Drawable upload = (ResourcesCompat.getDrawable(getResources(), R.drawable.uploadphoto, null));
+
+        if (bit1 == null)(top).setImageBitmap((Bitmap.createScaledBitmap(((BitmapDrawable) (upload)).getBitmap(), (int) (width * ((578) * height * .29) / (321 * width)), (int) (height * .29), false)));
+        if (bit2 == null)(bottom).setImageBitmap((Bitmap.createScaledBitmap(((BitmapDrawable) (upload)).getBitmap(), (int) (width * ((578) * height * .29) / (321 * width)), (int) (height * .29), false)));
+
+        top.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectImage(top);
+            }
+        });
+
+        bottom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectImage(bottom);
+            }
+        });
+
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Turn the time into milliseconds
-                long time = 60_000 * (10 + 60 * (0 + 24 * 0));
 
                 //TODO add additional verification for text boxes
                 if (textTop.getText().toString().equals("") || textBottom.getText().toString().equals("") || textCenter.getText().toString().equals("")) {
                     showToast("Must describe both options and add question.");
                 } else {
-                    selectImage(R.id.imageViewTop, true);
-
+                    Server.createPoll(textCenter.getText().toString(),textTop.getText().toString(),textBottom.getText().toString(),bit1,bit2);
                 }
             }
         });
     }
 
 
-    private void selectImage(int im, boolean first) { // select image button
+    private void selectImage(ImageButton im) { // select image button
         //im is the right image id when the right button is pressed.
         //im is the left  image id when the left  button is pressed.
         imageToSet = im;
 
         //Build prompt to take a photo
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if (first) builder.setTitle("Choose your first photo:");
-        else builder.setTitle("Choose your second photo:");
-        final CharSequence[] photoOptions = {"Take a photo", "Choose from gallery", "Cancel"};
+        builder.setTitle("Choose Photo:");
+        final CharSequence[] photoOptions = {"Take A Photo", "Choose From Gallery", "Cancel"};
         builder.setItems(photoOptions, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
@@ -186,13 +206,14 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            extras =data.getExtras();
-            run();
-        }
-        else if (requestCode == 2 && resultCode == RESULT_OK){
-            selectedImage = data.getData();
-            run();
+        if(resultCode == RESULT_OK&&data!=null) {
+            if (requestCode == 1) {
+                extras = data.getExtras();
+                run();
+            } else if (requestCode == 2) {
+                selectedImage = data.getData();
+                run();
+            }
         }
     }
 
