@@ -11,6 +11,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -103,6 +104,42 @@ public class Server {
             } catch (URISyntaxException e) {
                 // TODO Generic catch
                 e.printStackTrace();
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null; //If program gets this far, something didn't work.
+        }
+    }
+    private class SendGetRequest extends AsyncTask<String, Void, String> {
+        protected String doInBackground(String... params) {
+            try {
+                //Get the response
+                HttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                request.setURI(URI.create(WEB_ROOT + "vote.php"));
+                HttpResponse response = client.execute(request);
+
+                //Get content of response
+                HttpEntity entity = response.getEntity();
+                InputStream inputStream = entity.getContent();
+
+                ByteArrayOutputStream content = new ByteArrayOutputStream();
+
+                // Read response into a buffered stream
+                int readBytes = 0;
+                byte[] sBuffer = new byte[512];
+                while ((readBytes = inputStream.read(sBuffer)) != -1) {
+                    content.write(sBuffer, 0, readBytes);
+                }
+
+                //Return result from buffered stream
+                return new String(content.toByteArray());
+
+
             } catch (ClientProtocolException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
