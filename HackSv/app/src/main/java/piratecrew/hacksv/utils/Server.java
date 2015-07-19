@@ -3,6 +3,7 @@ package piratecrew.hacksv.utils;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Path;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -40,6 +41,7 @@ public class Server {
 
     public Server(Activity activity){
         this.activity = activity;
+
     }
 
 

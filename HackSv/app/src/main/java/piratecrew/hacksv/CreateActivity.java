@@ -35,7 +35,10 @@ public class CreateActivity extends AppCompatActivity implements Runnable {
     int requestCodeRun, resultCodeRun;
     Button create;
     EditText textTop, textCenter, textBottom, emailText;
-    Bitmap bitmap, bit1, bit2;
+    Bitmap bitmap;
+    Bitmap bit1;
+    Bitmap bit2;
+    String file;
     Bundle extras;
     ImageButton imageToSet;
     DisplayMetrics metrics;
@@ -213,6 +216,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable {
                         e.printStackTrace();
                     }
                 }
+                showToast("Be Back in 10 min!");
                 startActivity(new Intent(CreateActivity.this,MainActivity.class));
             }
         });
