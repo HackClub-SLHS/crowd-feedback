@@ -78,7 +78,13 @@ public class ViewActivity extends AppCompatActivity implements WebResponderI {
             Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
             startActivity(new Intent(ViewActivity.this, MainActivity.class));
         }
-        else {
+        else if (result[0].equals("Voting Failed: Server Error")) Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
+        else if (result[0].equals("Voting Successful")){
+            Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
+            Server.readPoll(this);
+
+        }
+        else{
             top.setImageBitmap(StringToBitMap(result[4]));
             bottom.setImageBitmap(StringToBitMap(result[5]));
             topText.setText(result[2]);

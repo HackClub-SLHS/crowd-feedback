@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 public class Server {
 
     static WebResponderI wr;
+    public static int n;
 
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
@@ -51,6 +52,7 @@ public class Server {
         String[] bit1 = {"pic1", sPic1};
         String[] bit2 = {"pic2", sPic2};
         String[] mail = {"email", email};
+        n = 0;
 
        new SendPostRequest().execute(host, opt1, opt2, qus, mail, bit1, bit2);
 
@@ -64,6 +66,10 @@ public class Server {
         wr = act;
         String[] id = {"id",ident};
         String[]vote = {"vote",choice};
+        String[] host = {WEB_ROOT+"create_poll.php"};
+        n = 1;
+
+        new SendPostRequest().execute(id,vote,host);
 
     }
 
@@ -135,8 +141,14 @@ public class Server {
             String message;
             try {
                 JSONObject data = new JSONObject(result);
-                if(data.has("error")) message = "Poll Create Failed: Server Error";
-                else message = "Poll Created";
+                if(data.has("error")){
+                    if (n==0)message = "Poll Create Failed: Server Error";
+                    else message="Voting Failed: Server Error";
+                }
+                else{
+                    if (n==0) message = "Poll Created";
+                    else message = "Voting Successful";
+                }
                 String[] s = {message,""};
                 wr.onWebResponse(s);
             } catch (JSONException e) {
@@ -151,7 +163,7 @@ public class Server {
                 //Get the response
                 HttpClient client = new DefaultHttpClient();
                 HttpGet request = new HttpGet();
-                request.setURI(URI.create(WEB_ROOT + "vote.php"));
+                request.setURI(URI.create(WEB_ROOT + "read_poll.php"));
                 HttpResponse response = client.execute(request);
 
                 //Get content of response
