@@ -55,17 +55,16 @@ public class Server {
        new SendPostRequest().execute(host, opt1, opt2, qus, mail, bit1, bit2);
 
     }
-    public static String readPoll(){
-        try {
-            SendGetRequest sgr = new SendGetRequest();
-            sgr.execute();
-            return String.valueOf((sgr.get()));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static void readPoll(WebResponderI act){
+        wr = act;
+        new SendGetRequest().execute();
+    }
+
+    public static void vote(WebResponderI act, String ident,String choice){
+        wr = act;
+        String[] id = {"id",ident};
+        String[]vote = {"vote",choice};
+
     }
 
     public static String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
@@ -133,12 +132,13 @@ public class Server {
             return null; //If program gets this far, something didn't work.
         }
         protected void onPostExecute(String result){
+            String message;
             try {
-                String message="";
                 JSONObject data = new JSONObject(result);
                 if(data.has("error")) message = "Poll Create Failed: Server Error";
                 else message = "Poll Created";
-                wr.onWebResponse(message);
+                String[] s = {message,""};
+                wr.onWebResponse(s);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -183,12 +183,21 @@ public class Server {
         }
     }
     protected void onPostExecute(String result){
+        String message="";
         try {
-            String message="";
             JSONObject data = new JSONObject(result);
-            if(data.has("error")) message = "Poll LoadFailed: Server Error";
-            else message = result;
-            wr.onWebResponse(message);
+            String[]s={"","","","","","",""};
+            if(data.has("error")) s[0] = "Poll Load Failed: Server Error";
+            else{
+                s[0]="Success";
+                s[1]=data.getString("question");
+                s[2]=data.getJSONObject("opt1").getString("text");
+                s[3]=data.getJSONObject("opt2").getString("text");
+                s[4]=data.getJSONObject("opt1").getString("img");
+                s[5]=data.getJSONObject("opt2").getString("img");
+                s[6]=String.valueOf(data.getInt("id"));
+            }
+            wr.onWebResponse(s);
         } catch (JSONException e) {
             e.printStackTrace();
         }

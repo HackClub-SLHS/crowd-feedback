@@ -26,6 +26,7 @@ public class BranchActivity extends AppCompatActivity {
         branch.initSession(new Branch.BranchReferralInitListener() {
             @Override
             public void onInitFinished(JSONObject referringParams, BranchError error) {
+
                 if (error == null) {
                     // params are the deep linked params associated with the link that the user clicked before showing up
                     TextView t = (TextView) findViewById(R.id.textView2);
@@ -44,6 +45,13 @@ public class BranchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_branch);
+
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (null != actionBar) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -54,17 +62,12 @@ public class BranchActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                startActivity(new Intent(BranchActivity.this, MainActivity.class));
         }
-
-        return super.onOptionsItemSelected(item);
+        return  true;
     }
-}
+
+    }

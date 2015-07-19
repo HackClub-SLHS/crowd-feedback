@@ -6,15 +6,26 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import piratecrew.hacksv.utils.Server;
 import piratecrew.hacksv.utils.WebResponderI;
 
 
 public class ViewActivity extends AppCompatActivity implements WebResponderI {
+
+    ImageButton top = (ImageButton)findViewById(R.id.firstImage);
+    ImageButton bottom=(ImageButton)findViewById(R.id.secondImage);
+    TextView topText = (TextView) findViewById(R.id.firstOption);
+    TextView bottomText = (TextView) findViewById(R.id.secondOption);
+    TextView question = (TextView)findViewById(R.id.question);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +37,7 @@ public class ViewActivity extends AppCompatActivity implements WebResponderI {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        Server.readPoll(this);
 
 
     }
@@ -61,7 +73,32 @@ public class ViewActivity extends AppCompatActivity implements WebResponderI {
     }
 
     @Override
-    public void onWebResponse(String result) {
+    public void onWebResponse(String[] result) {
+        if (result[0].equals("Poll Load Failed: Server Error")) {
+            Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(ViewActivity.this, MainActivity.class));
+        }
+        else {
+            top.setImageBitmap(StringToBitMap(result[4]));
+            bottom.setImageBitmap(StringToBitMap(result[5]));
+            topText.setText(result[2]);
+            bottomText.setText(result[3]);
+            question.setText(result[1]);
+
+            top.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+            bottom.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+        }
 
     }
 }

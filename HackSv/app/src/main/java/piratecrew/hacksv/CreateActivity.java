@@ -265,8 +265,8 @@ public class CreateActivity extends AppCompatActivity implements Runnable, WebRe
 
 
     @Override
-    public void onWebResponse(String result) {
-        Toast.makeText(getApplicationContext(),result,Toast.LENGTH_SHORT).show();
-        if (!result.equals("Server Error")) startActivity(new Intent(CreateActivity.this,BranchActivity.class));
+    public void onWebResponse(String[] result) {
+        Toast.makeText(getApplicationContext(),result[0],Toast.LENGTH_SHORT).show();
+        if (!result[0].equals("Server Error")) startActivity(new Intent(CreateActivity.this,BranchActivity.class));
     }
 }
