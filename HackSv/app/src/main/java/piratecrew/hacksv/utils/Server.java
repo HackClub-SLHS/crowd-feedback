@@ -1,26 +1,35 @@
 package piratecrew.hacksv.utils;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import java.io.ByteArrayOutputStream;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,129 +38,195 @@ import java.util.List;
  */
 public class Server {
 
-    static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
-
-    public static void createPoll(String text1, String text2,String question,String email, Bitmap pic1, Bitmap pic2){ //method to create a poll
-        
-        String[] host = {WEB_ROOT+"create_poll.php"};
-        String[] qus = {"qus", question};
-        String[] opt1  = {"opt1", text1};
-        String[] opt2 = {"opt2", text2};
-        String sPic1, sPic2;
-        if(pic1 == null || pic2 == null){sPic1 = "null"; sPic2 = "null";}
-        else{sPic1 = BitMapToString(pic1); sPic2 =BitMapToString(pic2);}
-        String[] bit1 = {"pic1", sPic1};
-        String[] bit2 = {"pic2", sPic2};
-        String[] mail = {"email", email};
-
-        Log.i("Test","1");
-        new SendPostRequest().execute(host, opt1, opt2, qus, mail, bit1, bit2);
-
+    public Server(Activity activity){
+        this.activity = activity;
     }
 
-    public static String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
-        ByteArrayOutputStream byteOutRiver = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutRiver);
-        byte [] b=byteOutRiver.toByteArray();
-        String temp= Base64.encodeToString(b, Base64.DEFAULT);
-        return temp;
+
+
+
+
+    private final static String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
+    private final static String CHARSET = StandardCharsets.UTF_8.name();
+    private final Activity activity;
+    public static void createPoll(String question, String text1, String text2, String email, String path_to_img1, String path_to_img2){ //method to create a poll
+
+        //Format the sent query
+        String query;
+        query = String.format("question=%s&opt1=%s&opt2=%s&email=%s",
+                question, text1, text2, email
+        );
+
+        new SendRequest().execute(WEB_ROOT + "create_poll.php", question, text1, text2, email, path_to_img1, path_to_img2);
     }
-    public Bitmap StringToBitMap(String encodedString) { // method t convert string to bitmap
-        try {
-            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
-        } catch (Exception e) {
-            e.getMessage();
-            return null;
-        }
-    }
-
-    static private class SendPostRequest extends AsyncTask<String[], Void, String> {
-
-        protected String doInBackground(String[]... params) {
-            try {
-                //Create request
-                HttpClient client = new DefaultHttpClient();
-                HttpPost httpPost = new HttpPost();
-
-                httpPost.setURI(new URI(params[0][0]));
-
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(params.length - 1);
-                for (int i = 1; i < params.length; i++) {
-                    nameValuePairs.add(new BasicNameValuePair(params[i][0], params[i][1]));
-                }
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-                //Get the response
-                HttpResponse response = client.execute(httpPost);
-
-                //Get content of response
-                HttpEntity entity = response.getEntity();
-                InputStream inputStream = entity.getContent();
-
-                ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-                // Read response into a buffered stream
-                int readBytes = 0;
-                byte[] sBuffer = new byte[512];
-                while ((readBytes = inputStream.read(sBuffer)) != -1) {
-                    content.write(sBuffer, 0, readBytes);
-                }
-
-                //Return result from buffered stream
-                return new String(content.toByteArray());
 
 
-            } catch (URISyntaxException e) {
-                // TODO Generic catch
-                e.printStackTrace();
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+    private static class SendRequest extends AsyncTask<String, Void, String> {
 
-            return null; //If program gets this far, something didn't work.
-        }
-    }
-    private class SendGetRequest extends AsyncTask<String, Void, String> {
+        //Requires: The url of the site (params[0]) and the query (params[1])
         protected String doInBackground(String... params) {
             try {
-                //Get the response
-                HttpClient client = new DefaultHttpClient();
-                HttpGet request = new HttpGet();
-                request.setURI(URI.create(WEB_ROOT + "vote.php"));
-                HttpResponse response = client.execute(request);
+                MultipartUtility multipart = new MultipartUtility(params[0], CHARSET);
 
-                //Get content of response
-                HttpEntity entity = response.getEntity();
-                InputStream inputStream = entity.getContent();
-
-                ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-                // Read response into a buffered stream
-                int readBytes = 0;
-                byte[] sBuffer = new byte[512];
-                while ((readBytes = inputStream.read(sBuffer)) != -1) {
-                    content.write(sBuffer, 0, readBytes);
+                if(params.length == 7){
+                    multipart.addFormField("question", params[1]);
+                    multipart.addFormField("opt1", params[2]);
+                    multipart.addFormField("opt2", params[3]);
+                    multipart.addFormField("email", params[4]);
+                    multipart.addFilePart("img1", new File(params[5]));
+                    multipart.addFilePart("img2", new File(params[6]));
                 }
 
-                //Return result from buffered stream
-                return new String(content.toByteArray());
 
+                List<String> responseUploadDocument = multipart.finish();
+                String responseUploadDocumentString = "";
 
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                for (String line : responseUploadDocument) {
+                    responseUploadDocumentString = line;
+                }
+
+                if (responseUploadDocumentString != null) {
+                    return responseUploadDocumentString;
+                }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            return null; //If program gets this far, something didn't work.
+            Log.e("Upload file", "No responce");
+            return null;
+        }
+
+        protected void onPostExecute(String result){
+            //activity.onWebResponse(result);
+            //TODO: do somehting
+        }
+    }
+
+
+    public static class MultipartUtility {
+        private final String boundary;
+        private static final String LINE_FEED = "\r\n";
+        private HttpURLConnection httpConn;
+        private String charset;
+        private OutputStream outputStream;
+        private PrintWriter writer;
+
+        /**
+         * This constructor initializes a new HTTP POST request with content type
+         * is set to multipart/form-data
+         * @param requestURL
+         * @param charset
+         * @throws IOException
+         */
+        public MultipartUtility(String requestURL, String charset)
+                throws IOException {
+            this.charset = charset;
+
+            // creates a unique boundary based on time stamp
+            boundary = "===" + System.currentTimeMillis() + "===";
+
+            URL url = new URL(requestURL);
+            httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setUseCaches(false);
+            httpConn.setDoOutput(true); // indicates POST method
+            httpConn.setDoInput(true);
+            httpConn.setRequestProperty("Content-Type",
+                    "multipart/form-data; boundary=" + boundary);
+            httpConn.setRequestProperty("User-Agent", "CodeJava Agent");
+            httpConn.setRequestProperty("Test", "Bonjour");
+            outputStream = httpConn.getOutputStream();
+            writer = new PrintWriter(new OutputStreamWriter(outputStream, charset),
+                    true);
+        }
+
+        /**
+         * Adds a form field to the request
+         * @param name field name
+         * @param value field value
+         */
+        public void addFormField(String name, String value) {
+            writer.append("--" + boundary).append(LINE_FEED);
+            writer.append("Content-Disposition: form-data; name=\"" + name + "\"")
+                    .append(LINE_FEED);
+            writer.append("Content-Type: text/plain; charset=" + charset).append(
+                    LINE_FEED);
+            writer.append(LINE_FEED);
+            writer.append(value).append(LINE_FEED);
+            writer.flush();
+        }
+
+        /**
+         * Adds a upload file section to the request
+         * @param fieldName name attribute in <input type="file" name="..." />
+         * @param uploadFile a File to be uploaded
+         * @throws IOException
+         */
+        public void addFilePart(String fieldName, File uploadFile) throws IOException {
+            String fileName = uploadFile.getName();
+            writer.append("--" + boundary).append(LINE_FEED);
+            writer.append(
+                    "Content-Disposition: form-data; name=\"" + fieldName
+                            + "\"; filename=\"" + fileName + "\"")
+                    .append(LINE_FEED);
+            writer.append(
+                    "Content-Type: "
+                            + URLConnection.guessContentTypeFromName(fileName))
+                    .append(LINE_FEED);
+            writer.append("Content-Transfer-Encoding: binary").append(LINE_FEED);
+            writer.append(LINE_FEED);
+            writer.flush();
+
+            FileInputStream inputStream = new FileInputStream(uploadFile);
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.flush();
+            inputStream.close();
+
+            writer.append(LINE_FEED);
+            writer.flush();
+        }
+
+        /**
+         * Adds a header field to the request.
+         * @param name - name of the header field
+         * @param value - value of the header field
+         */
+        public void addHeaderField(String name, String value) {
+            writer.append(name + ": " + value).append(LINE_FEED);
+            writer.flush();
+        }
+
+        /**
+         * Completes the request and receives response from the server.
+         * @return a list of Strings as response in case the server returned
+         * status OK, otherwise an exception is thrown.
+         * @throws IOException
+         */
+        public List<String> finish() throws IOException {
+            List<String> response = new ArrayList<String>();
+
+            writer.append(LINE_FEED).flush();
+            writer.append("--" + boundary + "--").append(LINE_FEED);
+            writer.close();
+
+            // checks server's status code first
+            int status = httpConn.getResponseCode();
+            if (status == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        httpConn.getInputStream()));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    response.add(line);
+                }
+                reader.close();
+                httpConn.disconnect();
+            } else {
+                throw new IOException("Server returned non-OK status: " + status);
+            }
+
+            return response;
         }
     }
 }
-

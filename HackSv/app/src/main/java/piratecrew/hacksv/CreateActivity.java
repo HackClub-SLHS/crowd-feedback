@@ -1,15 +1,11 @@
 package piratecrew.hacksv;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -26,14 +22,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
-import android.widget.Toolbar;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.Runnable;
 import piratecrew.hacksv.utils.Server;
 
-public class CreateActivity extends AppCompatActivity implements Runnable{
+public class CreateActivity extends AppCompatActivity implements Runnable {
 
     int requestCodeRun, resultCodeRun;
     Button create;
@@ -47,28 +44,33 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
     Uri selectedImage;
     ImageButton top;
     ImageButton bottom;
+    String rout1;
+    String rout2;
+    int num;
+
+    public int number(){
+        num = 0;
+        return num ++;
+    }
 
     @Override
     public void run() {
         bitmap = null;
         if (resultCodeRun == RESULT_OK) {
-            if (requestCodeRun ==1) {   //took a photo
-                if (imageToSet == top){
-                    bit1 = null;
-                }
-                else{
-                    bit2 = null;
-                }
+            if (requestCodeRun == 1) {   //took a photo
+
                 bitmap = Bitmap.createScaledBitmap((Bitmap) extras.get("data"), (int) (width * ((((Bitmap) extras.get("data")).getWidth() * height * .29) / (((Bitmap) extras.get("data")).getHeight() * width))), (int) (height * .29), false);
+                if(imageToSet == top) {
+                    bit1 = bitmap;
+
                     imageToSet.setImageBitmap(bitmap);
 
-                    //TODO: find why to use this code
-                   /* OutputStream outFile = null;
+                    OutputStream outFile = null;
                     String path = android.os.Environment
                             .getExternalStorageDirectory()
-                            +File.separator
-                            + "createAct" + File.separator + "default"; //create the file name
-                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
+                            + File.separator
+                            + "DCIM" + File.separator + "100ANDRO"; //create the file name
+                    File file = new File(path, "DSC_0010" + ".jpg");
                     try {
                         outFile = new FileOutputStream(file);
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outFile); //compress captured image
@@ -80,49 +82,67 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }*/
+                    }
+                    Log.i("INFO:", file.toString());
 
-            }
-            else if (requestCodeRun == 2) {    //choose photo
-
-                if (imageToSet == top){
-                    bit1 = null;
+                    if (imageToSet == top) {
+                        rout1 = file.toString();
+                    }
                 }
                 else{
-                    bit2 = null;
+                    bit2 = bitmap;
+
+                    imageToSet.setImageBitmap(bitmap);
+
+                    OutputStream outFile = null;
+                    String path = android.os.Environment
+                            .getExternalStorageDirectory()
+                            + File.separator
+                            + "DCIM" + File.separator + "100ANDRO"; //create the file name
+                    File file = new File(path, "DSC_0011" + ".jpg");
+                    try {
+                        outFile = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outFile); //compress captured image
+                        outFile.flush();
+                        outFile.close();
+                    } catch (FileNotFoundException e) { //idk what these are it just had to be there
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("INFO:", file.toString());
+
+                    rout2 = file.toString();
+
                 }
+            }
+        } else if (requestCodeRun == 2) {    //choose photo
 
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
-                cursor.close();
-                bitmap = (Bitmap.createScaledBitmap((BitmapFactory.decodeFile(picturePath)), (int) (width * (((BitmapFactory.decodeFile(picturePath)).getWidth() * height * .29) / ((BitmapFactory.decodeFile(picturePath)).getHeight() * width))), (int) (height * .29), false));
 
-                //TODO: find why to use this code
-                /*OutputStream compressThumbnail = null;
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+            bitmap = (Bitmap.createScaledBitmap((BitmapFactory.decodeFile(picturePath)), (int) (width * (((BitmapFactory.decodeFile(picturePath)).getWidth() * height * .29) / ((BitmapFactory.decodeFile(picturePath)).getHeight() * width))), (int) (height * .29), false));
+
+/*
+                OutputStream compressThumbnail = null;
                 try {
                     compressThumbnail = new FileOutputStream(picturePath);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
                 thumbnail.compress(Bitmap.CompressFormat.JPEG,85,compressThumbnail); //use to compress the display image
-                Log.w("image path:", picturePath + "");*/
+                Log.w("image path:", picturePath + "");
                 imageToSet.setImageBitmap(bitmap);
-
-            }
+*/
         }
-        if (imageToSet == top){
-            if (bit1!=null)bit1.recycle();
-            bit1 = bitmap;
-        }
-        else{
-            if(bit2!=null)bit2.recycle();
-            bit2 = bitmap;
-        }
-         Log.i("Running", "Thread is running");
     }
+
 
     void showToast(CharSequence msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -187,8 +207,13 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
                 if (textTop.getText().toString().equals("") || textBottom.getText().toString().equals("") || textCenter.getText().toString().equals("")) {
                     showToast("Must fill in all fields.");
                 } else {
-                    Server.createPoll(textTop.getText().toString(), textBottom.getText().toString(), textCenter.getText().toString(), emailText.getText().toString(), bit1, bit2);
+                    try {
+                        Server.createPoll(textTop.getText().toString(), textCenter.getText().toString(), textBottom.getText().toString(), emailText.getText().toString(),rout1, rout2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                startActivity(new Intent(CreateActivity.this,MainActivity.class));
             }
         });
     }
@@ -202,7 +227,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         //Build prompt to take a photo
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose Photo:");
-        final CharSequence[] photoOptions = {"Take A Photo", "Choose From Gallery", "Cancel"};
+        final CharSequence[] photoOptions = {"Take A Photo","choose form gallery", "Cancel"};
         builder.setItems(photoOptions, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
