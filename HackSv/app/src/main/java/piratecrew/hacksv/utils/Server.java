@@ -32,6 +32,7 @@ public class Server {
 
     public void createPoll(String question,String text1, String text2, Bitmap pic1, Bitmap pic2){ //method to create a poll
 
+        String[] host = {WEB_ROOT+"create_poll.php"};
         String[] qus = {"qus", question};
         String[] opt1  = {"opt1", text1};
         String[] opt2 = {"opt2", text2};
@@ -41,7 +42,7 @@ public class Server {
         String[] bit1 = {"pic1", sPic1};
         String[] bit2 = {"pic2", sPic2};
 
-        new SendPostRequest().execute(qus,opt1, opt2, bit1, bit2);
+        new SendPostRequest().execute(host,qus,opt1, opt2, bit1, bit2);
     }
 
     public String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
