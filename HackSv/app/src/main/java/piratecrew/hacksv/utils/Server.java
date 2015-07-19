@@ -31,7 +31,7 @@ public class Server {
 
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
-    public void createPoll(String question,String text1, String text2, Bitmap pic1, Bitmap pic2){ //method to create a poll
+    public static void createPoll(String question,String text1, String text2, Bitmap pic1, Bitmap pic2){ //method to create a poll
 
         String[] host = {WEB_ROOT+"create_poll.php"};
         String[] qus = {"qus", question};
@@ -46,7 +46,7 @@ public class Server {
         new SendPostRequest().execute(host,qus,opt1, opt2, bit1, bit2);
     }
 
-    public String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
+    public static String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
         ByteArrayOutputStream byteOutRiver = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutRiver);
         byte [] b=byteOutRiver.toByteArray();

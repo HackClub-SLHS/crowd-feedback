@@ -21,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.lang.Runnable;
-import piratecrew.hacksv.util.Server;
+import piratecrew.hacksv.utils.Server;
 
 public class CreateActivity extends AppCompatActivity implements Runnable{
 
@@ -98,7 +98,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         else{
             bit2 = bitmap;
             bitmap.recycle();
-            Server.createPoll(textCenter.getText(),textTop.getText(),textBottom.getText(),bit1,bit2);
+            Server.createPoll(textCenter.getText().toString(),textTop.getText().toString(),textBottom.getText().toString(),bit1,bit2);
         }
          Log.i("Running", "Thread is running");
     }
