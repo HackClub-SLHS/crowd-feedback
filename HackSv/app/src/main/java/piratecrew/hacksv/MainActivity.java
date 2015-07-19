@@ -20,7 +20,7 @@ public class MainActivity extends ActionBarActivity {
         voteAct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, VoteActivity.class));
+                startActivity(new Intent(MainActivity.this, ViewActivity.class));
             }
         });
         createAct.setOnClickListener(new View.OnClickListener() {
