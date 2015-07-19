@@ -32,7 +32,7 @@ public class Server {
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
     public static void createPoll(String text1, String text2,String question,String email, Bitmap pic1, Bitmap pic2){ //method to create a poll
-
+        
         String[] host = {WEB_ROOT+"create_poll.php"};
         String[] qus = {"qus", question};
         String[] opt1  = {"opt1", text1};
