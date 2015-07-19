@@ -2,6 +2,7 @@ package piratecrew.hacksv.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Path;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -31,17 +32,17 @@ public class Server {
 
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
-    public static void createPoll(String text1, String text2,String question,String email, Bitmap pic1, Bitmap pic2){ //method to create a poll
+    public static void createPoll(String text1, String text2,String question,String email, String pic1, String pic2){ //method to create a poll
         
         String[] host = {WEB_ROOT+"create_poll.php"};
         String[] qus = {"qus", question};
         String[] opt1  = {"opt1", text1};
         String[] opt2 = {"opt2", text2};
         String sPic1, sPic2;
-        if(pic1 == null || pic2 == null){sPic1 = "null"; sPic2 = "null";}
-        else{sPic1 = BitMapToString(pic1); sPic2 =BitMapToString(pic2);}
-        String[] bit1 = {"pic1", sPic1};
-        String[] bit2 = {"pic2", sPic2};
+        //if(pic1 == null || pic2 == null){sPic1 = "null"; sPic2 = "null";}
+        //else{sPic1 = BitMapToString(pic1); sPic2 =BitMapToString(pic2);}
+        String[] bit1 = {"pic1", pic1};
+        String[] bit2 = {"pic2", pic2};
         String[] mail = {"email", email};
 
         Log.i("Test","1");
