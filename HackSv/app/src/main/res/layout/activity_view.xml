@@ -11,17 +11,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/secondImage"
         android:src="@drawable/jeb"
-        android:layout_marginTop="312dp"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/question"
+        android:layout_alignParentEnd="true" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/firstImage"
         android:src="@drawable/trump"
-        android:layout_marginBottom="233dp"
-        android:layout_alignBottom="@+id/secondImage"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/question" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,11 +28,10 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Who will you vote for US President of 2016?"
         android:id="@+id/question"
-        android:layout_marginBottom="182dp"
         android:textColor="#ff000000"
         android:textStyle="bold"
-        android:layout_alignBottom="@+id/secondImage"
-        android:layout_alignParentStart="true" />
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:layout_width="wrap_content"
