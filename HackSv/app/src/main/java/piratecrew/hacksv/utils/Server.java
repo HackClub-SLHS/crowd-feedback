@@ -1,13 +1,27 @@
 package piratecrew.hacksv.utils;
 
-import org.json.JSONArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Base64;
 
-import java.io.BufferedOutputStream;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import 	java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jiahao on 7/18/2015.
@@ -16,32 +30,87 @@ public class Server {
 
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
-    public String sendPoll( data) throws IOException {
-        URL url = new URL(WEB_ROOT);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setReadTimeout(10000 /*milliseconds*/);
-        urlConnection.setConnectTimeout(15000 /* milliseconds */);
-        urlConnection.setRequestMethod("POST");
-        urlConnection.setDoInput(true);
-        urlConnection.setDoOutput(true);
+    public void createPoll(String question,String text1, String text2, Bitmap pic1, Bitmap pic2){ //method to create a poll
 
-        //make some HTTP header nicety
-        urlConnection.setRequestProperty("Content-Type", "application/json;charset=utf-8");
-        urlConnection.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+        String[] qus = {"qus", question};
+        String[] opt1  = {"opt1", text1};
+        String[] opt2 = {"opt2", text2};
+        String sPic1, sPic2;
+        if(pic1 == null || pic2 == null){sPic1 = "null"; sPic2 = "null";}
+        else{sPic1 = BitMapToString(pic1); sPic2 =BitMapToString(pic2);}
+        String[] bit1 = {"pic1", sPic1};
+        String[] bit2 = {"pic2", sPic2};
 
-        //open connection
-        urlConnection.connect();
+        new SendPostRequest().execute(qus,opt1, opt2, bit1, bit2);
+    }
 
-        //setup send
-        OutputStream os = new BufferedOutputStream(urlConnection.getOutputStream());
-        os.write(data.getBytes());
+    public String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
+        ByteArrayOutputStream byteOutRiver = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutRiver);
+        byte [] b=byteOutRiver.toByteArray();
+        String temp= Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
+    }
+    public Bitmap StringToBitMap(String encodedString) { // method t convert string to bitmap
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
 
-        //clean up
-        os.flush();
-        os.close();
-        urlConnection.disconnect();
+    static private class SendPostRequest extends AsyncTask<String[], Void, String> {
 
-        return null;
+        protected String doInBackground(String[]... params) {
+            try {
+                //Create request
+                HttpClient client = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost();
+
+                httpPost.setURI(new URI(params[0][0]));
+
+
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(params.length - 1);
+                for (int i = 1; i < params.length; i++) {
+                    nameValuePairs.add(new BasicNameValuePair(params[i][0], params[i][1]));
+                }
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+                //Get the response
+                HttpResponse response = client.execute(httpPost);
+
+                //Get content of response
+                HttpEntity entity = response.getEntity();
+                InputStream inputStream = entity.getContent();
+
+                ByteArrayOutputStream content = new ByteArrayOutputStream();
+
+                // Read response into a buffered stream
+                int readBytes = 0;
+                byte[] sBuffer = new byte[512];
+                while ((readBytes = inputStream.read(sBuffer)) != -1) {
+                    content.write(sBuffer, 0, readBytes);
+                }
+
+                //Return result from buffered stream
+                return new String(content.toByteArray());
+
+
+            } catch (URISyntaxException e) {
+                // TODO Generic catch
+                e.printStackTrace();
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null; //If program gets this far, something didn't work.
+        }
     }
 }
 
