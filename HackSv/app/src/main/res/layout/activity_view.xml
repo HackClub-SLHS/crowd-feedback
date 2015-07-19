@@ -9,18 +9,18 @@
 
 
     <ImageButton
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/secondImage"
-        android:src="@drawable/jeb"
+        android:layout_alignParentBottom="true"
         android:layout_below="@+id/question"
         android:layout_alignParentEnd="true" />
 
     <ImageButton
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/firstImage"
-        android:src="@drawable/trump"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_above="@+id/question" />
 
@@ -28,19 +28,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Who will you vote for US President of 2016?"
         android:id="@+id/question"
         android:textColor="#ff000000"
         android:maxLines="2"
         android:textStyle="bold"
         android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Donald Trump"
         android:id="@+id/firstOption"
         android:textStyle="bold"
         android:textColor="#000000"
@@ -55,7 +53,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Jeb Bush"
         android:id="@+id/secondOption"
         android:textStyle="bold"
         android:textColor="#000000"

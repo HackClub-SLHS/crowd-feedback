@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.branch.referral.Branch;
@@ -22,18 +23,20 @@ public class BranchActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        Branch branch = Branch.getInstance();
+        Branch branch = Branch.getInstance(getApplicationContext());
         branch.initSession(new Branch.BranchReferralInitListener() {
             @Override
             public void onInitFinished(JSONObject referringParams, BranchError error) {
-
                 if (error == null) {
-                    // params are the deep linked params associated with the link that the user clicked before showing up
-                    TextView t = (TextView) findViewById(R.id.textView2);
-                    t.setText(referringParams.toString());
+
                 }
             }
-        }, this.getIntent().getData(), this);
+        });
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        Branch.getInstance(getApplicationContext()).closeSession();
     }
 
     @Override
@@ -55,8 +58,8 @@ public class BranchActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+            public boolean onCreateOptionsMenu (Menu menu){
+                // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_branch, menu);
         return true;
     }

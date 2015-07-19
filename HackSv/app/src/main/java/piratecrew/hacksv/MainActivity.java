@@ -23,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.i("",this.getIntent().toUri(Intent.URI_INTENT_SCHEME).toString());
+
         setContentView(R.layout.activity_main);
         Button createAct = (Button) findViewById(R.id.buttonCreate);
         Button voteAct = (Button) findViewById(R.id.buttonVote);

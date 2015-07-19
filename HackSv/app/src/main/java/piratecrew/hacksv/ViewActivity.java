@@ -21,16 +21,25 @@ import piratecrew.hacksv.utils.WebResponderI;
 
 public class ViewActivity extends AppCompatActivity implements WebResponderI {
 
-    ImageButton top = (ImageButton)findViewById(R.id.firstImage);
-    ImageButton bottom=(ImageButton)findViewById(R.id.secondImage);
-    TextView topText = (TextView) findViewById(R.id.firstOption);
-    TextView bottomText = (TextView) findViewById(R.id.secondOption);
-    TextView question = (TextView)findViewById(R.id.question);
+    ImageButton top;
+    ImageButton bottom;
+    TextView topText;
+    TextView bottomText;
+    TextView question;
+    WebResponderI w;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
+
+        top = (ImageButton)findViewById(R.id.firstImage);
+        bottom=(ImageButton)findViewById(R.id.secondImage);
+        topText = (TextView) findViewById(R.id.firstOption);
+        bottomText = (TextView) findViewById(R.id.secondOption);
+        question = (TextView)findViewById(R.id.question);
+        w= this;
+
         final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (null != actionBar) {
             actionBar.setDisplayShowHomeEnabled(true);
@@ -73,37 +82,44 @@ public class ViewActivity extends AppCompatActivity implements WebResponderI {
     }
 
     @Override
-    public void onWebResponse(String[] result) {
-        if (result[0].equals("Poll Load Failed: Server Error")) {
-            Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(ViewActivity.this, MainActivity.class));
-        }
-        else if (result[0].equals("Voting Failed: Server Error")) Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
-        else if (result[0].equals("Voting Successful")){
-            Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
-            Server.readPoll(this);
+    public void onWebResponse(final String[] result) {
+        switch (result[0]) {
+            case "Poll Load Failed: Server Error":
+                Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ViewActivity.this, MainActivity.class));
+                break;
+            case "Voting Failed: Server Error":
+                Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
+                break;
+            case "Voting Successful":
+                Toast.makeText(getApplicationContext(), result[0], Toast.LENGTH_SHORT).show();
+                Server.readPoll(this);
 
-        }
-        else{
-            top.setImageBitmap(StringToBitMap(result[4]));
-            bottom.setImageBitmap(StringToBitMap(result[5]));
-            topText.setText(result[2]);
-            bottomText.setText(result[3]);
-            question.setText(result[1]);
+                break;
+            default:
+                top.setImageBitmap(StringToBitMap(result[4]));
+                bottom.setImageBitmap(StringToBitMap(result[5]));
+                topText.setText(result[2]);
+                bottomText.setText(result[3]);
+                question.setText(result[1]);
 
-            top.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+                top.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Server.vote(w,result[6],"1");
+                        top.setOnClickListener(null);
 
-                }
-            });
+                    }
+                });
 
-            bottom.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                }
-            });
+                bottom.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Server.vote(w,result[6],"1");
+                        bottom.setOnClickListener(null);
+                    }
+                });
+                break;
         }
 
     }

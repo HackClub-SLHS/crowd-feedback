@@ -1,15 +1,11 @@
 package piratecrew.hacksv;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -28,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Runnable;
@@ -39,7 +36,8 @@ public class CreateActivity extends AppCompatActivity implements Runnable, WebRe
     int requestCodeRun, resultCodeRun;
     Button create;
     EditText textTop, textCenter, textBottom, emailText;
-    Bitmap bitmap, bit1, bit2;
+    Bitmap bitmap;
+    String bit1, bit2, file;
     Bundle extras;
     ImageButton imageToSet;
     DisplayMetrics metrics;
@@ -55,34 +53,13 @@ public class CreateActivity extends AppCompatActivity implements Runnable, WebRe
         bitmap = null;
         if (resultCodeRun == RESULT_OK) {
             if (requestCodeRun ==1) {   //took a photo
-                if (imageToSet == top){
-                    bit1 = null;
-                }
-                else{
-                    bit2 = null;
-                }
                 bitmap = Bitmap.createScaledBitmap((Bitmap) extras.get("data"), (int) (width * ((((Bitmap) extras.get("data")).getWidth() * height * .29) / (((Bitmap) extras.get("data")).getHeight() * width))), (int) (height * .29), false);
                     imageToSet.setImageBitmap(bitmap);
 
-                    //TODO: find why to use this code
-                   /* OutputStream outFile = null;
-                    String path = android.os.Environment
+                    file = android.os.Environment
                             .getExternalStorageDirectory()
-                            +File.separator
-                            + "createAct" + File.separator + "default"; //create the file name
-                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
-                    try {
-                        outFile = new FileOutputStream(file);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outFile); //compress captured image
-                        outFile.flush();
-                        outFile.close();
-                    } catch (FileNotFoundException e) { //idk what these are it just had to be there
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }*/
+                            + File.separator
+                            + "createAct" + File.separator + "default"; //create the file path
 
             }
             else if (requestCodeRun == 2) {    //choose photo
@@ -98,30 +75,18 @@ public class CreateActivity extends AppCompatActivity implements Runnable, WebRe
                 Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
                 cursor.moveToFirst();
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
+                String file = cursor.getString(columnIndex);
                 cursor.close();
-                bitmap = (Bitmap.createScaledBitmap((BitmapFactory.decodeFile(picturePath)), (int) (width * (((BitmapFactory.decodeFile(picturePath)).getWidth() * height * .29) / ((BitmapFactory.decodeFile(picturePath)).getHeight() * width))), (int) (height * .29), false));
-
-                //TODO: find why to use this code
-                /*OutputStream compressThumbnail = null;
-                try {
-                    compressThumbnail = new FileOutputStream(picturePath);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                thumbnail.compress(Bitmap.CompressFormat.JPEG,85,compressThumbnail); //use to compress the display image
-                Log.w("image path:", picturePath + "");*/
+                bitmap = (Bitmap.createScaledBitmap((BitmapFactory.decodeFile(file)), (int) (width * (((BitmapFactory.decodeFile(file)).getWidth() * height * .29) / ((BitmapFactory.decodeFile(file)).getHeight() * width))), (int) (height * .29), false));
                 imageToSet.setImageBitmap(bitmap);
 
             }
         }
         if (imageToSet == top){
-            if (bit1!=null)bit1.recycle();
-            bit1 = bitmap;
+            bit1 = file;
         }
         else{
-            if(bit2!=null)bit2.recycle();
-            bit2 = bitmap;
+            bit2 = file;
         }
          Log.i("Running", "Thread is running");
     }
@@ -190,7 +155,15 @@ public class CreateActivity extends AppCompatActivity implements Runnable, WebRe
                 if (textTop.getText().toString().equals("") || textBottom.getText().toString().equals("") || textCenter.getText().toString().equals("")) {
                     showToast("Must fill in all fields.");
                 } else {
-                    Server.createPoll(textTop.getText().toString(), textBottom.getText().toString(), textCenter.getText().toString(), emailText.getText().toString(), bit1, bit2,wr);
+                    Server.createPoll(textTop.getText().toString(), textBottom.getText().toString(), textCenter.getText().toString(), emailText.getText().toString(), bit1, bit2, wr);
+                    create.setClickable(false);
+                    create.setText("Loading...");
+                    top.setClickable(false);
+                    bottom.setClickable(false);
+                    textTop.setClickable(false);
+                    textCenter.setClickable(false);
+                    textBottom.setClickable(false);
+
                 }
             }
         });
@@ -244,21 +217,23 @@ public class CreateActivity extends AppCompatActivity implements Runnable, WebRe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home: startActivity(new Intent(CreateActivity.this, MainActivity.class));
-        }
+            if (create.getText().equals("Loading...")) Toast.makeText(getApplicationContext(),"Please wait for the server to finish running before leaving.",Toast.LENGTH_SHORT).show();
+            else if (menuItem.equals( android.R.id.home))startActivity(new Intent(CreateActivity.this, MainActivity.class));
         return (super.onOptionsItemSelected(menuItem));
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK&&data!=null) {
+
+
+        if (resultCode == RESULT_OK && data != null) {
             if (requestCode == 1) {
                 extras = data.getExtras();
                 run();
             } else if (requestCode == 2) {
                 selectedImage = data.getData();
                 run();
+
             }
         }
     }
@@ -266,7 +241,14 @@ public class CreateActivity extends AppCompatActivity implements Runnable, WebRe
 
     @Override
     public void onWebResponse(String[] result) {
+        create.setText("Create");
+        create.setClickable(true);
+        top.setClickable(true);
+        bottom.setClickable(true);
+        textTop.setClickable(true);
+        textCenter.setClickable(true);
+        textBottom.setClickable(true);
         Toast.makeText(getApplicationContext(),result[0],Toast.LENGTH_SHORT).show();
-        if (!result[0].equals("Server Error")) startActivity(new Intent(CreateActivity.this,BranchActivity.class));
+        startActivity(new Intent(CreateActivity.this, MainActivity .class));
     }
 }

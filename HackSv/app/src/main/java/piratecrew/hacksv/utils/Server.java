@@ -39,18 +39,15 @@ public class Server {
 
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
-    public static void createPoll(String text1, String text2,String question,String email, Bitmap pic1, Bitmap pic2,WebResponderI act){ //method to create a poll
+    public static void createPoll(String text1, String text2,String question,String email, String pic1, String pic2,WebResponderI act){ //method to create a poll
 
         wr = act;
         String[] host = {WEB_ROOT+"create_poll.php"};
         String[] qus = {"qus", question};
         String[] opt1  = {"opt1", text1};
         String[] opt2 = {"opt2", text2};
-        String sPic1, sPic2;
-        if(pic1 == null || pic2 == null){sPic1 = "null"; sPic2 = "null";}
-        else{sPic1 = BitMapToString(pic1); sPic2 =BitMapToString(pic2);}
-        String[] bit1 = {"pic1", sPic1};
-        String[] bit2 = {"pic2", sPic2};
+        String[] bit1 = {"pic1", pic1};
+        String[] bit2 = {"pic2", pic2};
         String[] mail = {"email", email};
         n = 0;
 
@@ -65,11 +62,13 @@ public class Server {
     public static void vote(WebResponderI act, String ident,String choice){
         wr = act;
         String[] id = {"id",ident};
+        Log.i("",ident);
         String[]vote = {"vote",choice};
-        String[] host = {WEB_ROOT+"create_poll.php"};
+        Log.i("",choice);
+        String[] host = {WEB_ROOT+"vote.php"};
         n = 1;
 
-        new SendPostRequest().execute(id,vote,host);
+        new SendPostRequest().execute(host,id,vote);
 
     }
 
@@ -101,9 +100,10 @@ public class Server {
 
                 httpPost.setURI(new URI(params[0][0]));
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(params.length - 1);
-                for (int i = 1; i < params.length; i++) {
-                    nameValuePairs.add(new BasicNameValuePair(params[i][0], params[i][1]));
-                }
+                    for (int i = 1; i < params.length; i++) {
+                        nameValuePairs.add(new BasicNameValuePair(params[i][0], params[i][1]));
+                    }
+
                 httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
                 //Get the response
@@ -142,6 +142,7 @@ public class Server {
             try {
                 JSONObject data = new JSONObject(result);
                 if(data.has("error")){
+                    Log.i("server_error",result);
                     if (n==0)message = "Poll Create Failed: Server Error";
                     else message="Voting Failed: Server Error";
                 }
@@ -193,26 +194,27 @@ public class Server {
             }
             return null; //If program gets this far, something didn't work.
         }
-    }
-    protected void onPostExecute(String result){
-        String message="";
-        try {
-            JSONObject data = new JSONObject(result);
-            String[]s={"","","","","","",""};
-            if(data.has("error")) s[0] = "Poll Load Failed: Server Error";
-            else{
-                s[0]="Success";
-                s[1]=data.getString("question");
-                s[2]=data.getJSONObject("opt1").getString("text");
-                s[3]=data.getJSONObject("opt2").getString("text");
-                s[4]=data.getJSONObject("opt1").getString("img");
-                s[5]=data.getJSONObject("opt2").getString("img");
-                s[6]=String.valueOf(data.getInt("id"));
+        protected void onPostExecute(String result){
+            String message="";
+            try {
+                JSONObject data = new JSONObject(result);
+                String[]s={"","","","","","",""};
+                if(data.has("error")) s[0] = "Poll Load Failed: Server Error";
+                else{
+                    s[0]="Success";
+                    s[1]=data.getJSONObject("poll").getString("question");
+                    s[2]=data.getJSONObject("poll").getJSONObject("opt1").getString("text");
+                    s[3]=data.getJSONObject("poll").getJSONObject("opt2").getString("text");
+                    s[4]=data.getJSONObject("poll").getJSONObject("opt1").getString("img");
+                    s[5]=data.getJSONObject("poll").getJSONObject("opt2").getString("img");
+                    s[6]=String.valueOf(data.getJSONObject("poll").getInt("id"));
+                }
+                wr.onWebResponse(s);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            wr.onWebResponse(s);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    }
+
 
     }
 }
