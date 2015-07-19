@@ -6,4 +6,5 @@
     <string name="title_activity_create">Create A Poll</string>
     <string name="title_activity_vote">VoteActivity</string>
     <string name="title_activity_view">Vote On Polls</string>
+    <string name="title_activity_branch">Share Your Poll</string>
 </resources>

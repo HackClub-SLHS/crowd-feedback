@@ -16,6 +16,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,16 +27,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by jiahao on 7/18/2015.
  */
 public class Server {
 
+    static WebResponderI wr;
+
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
-    public static void createPoll(String text1, String text2,String question,String email, Bitmap pic1, Bitmap pic2){ //method to create a poll
-        
+    public static void createPoll(String text1, String text2,String question,String email, Bitmap pic1, Bitmap pic2,WebResponderI act){ //method to create a poll
+
+        wr = act;
         String[] host = {WEB_ROOT+"create_poll.php"};
         String[] qus = {"qus", question};
         String[] opt1  = {"opt1", text1};
@@ -44,9 +52,20 @@ public class Server {
         String[] bit2 = {"pic2", sPic2};
         String[] mail = {"email", email};
 
-        Log.i("Test","1");
-        new SendPostRequest().execute(host, opt1, opt2, qus, mail, bit1, bit2);
+       new SendPostRequest().execute(host, opt1, opt2, qus, mail, bit1, bit2);
 
+    }
+    public static String readPoll(){
+        try {
+            SendGetRequest sgr = new SendGetRequest();
+            sgr.execute();
+            return String.valueOf((sgr.get()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
@@ -76,7 +95,6 @@ public class Server {
                 HttpPost httpPost = new HttpPost();
 
                 httpPost.setURI(new URI(params[0][0]));
-
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(params.length - 1);
                 for (int i = 1; i < params.length; i++) {
                     nameValuePairs.add(new BasicNameValuePair(params[i][0], params[i][1]));
@@ -85,13 +103,11 @@ public class Server {
 
                 //Get the response
                 HttpResponse response = client.execute(httpPost);
-
                 //Get content of response
                 HttpEntity entity = response.getEntity();
                 InputStream inputStream = entity.getContent();
 
                 ByteArrayOutputStream content = new ByteArrayOutputStream();
-
                 // Read response into a buffered stream
                 int readBytes = 0;
                 byte[] sBuffer = new byte[512];
@@ -116,8 +132,20 @@ public class Server {
 
             return null; //If program gets this far, something didn't work.
         }
+        protected void onPostExecute(String result){
+            try {
+                String message="";
+                JSONObject data = new JSONObject(result);
+                if(data.has("error")) message = "Poll Create Failed: Server Error";
+                else message = "Poll Created";
+                wr.onWebResponse(message);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
-    private class SendGetRequest extends AsyncTask<String, Void, String> {
+    private static class SendGetRequest extends AsyncTask<String, Void, String> {
         protected String doInBackground(String... params) {
             try {
                 //Get the response
@@ -140,6 +168,7 @@ public class Server {
                 }
 
                 //Return result from buffered stream
+
                 return new String(content.toByteArray());
 
 
@@ -152,6 +181,18 @@ public class Server {
             }
             return null; //If program gets this far, something didn't work.
         }
+    }
+    protected void onPostExecute(String result){
+        try {
+            String message="";
+            JSONObject data = new JSONObject(result);
+            if(data.has("error")) message = "Poll LoadFailed: Server Error";
+            else message = result;
+            wr.onWebResponse(message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }
 

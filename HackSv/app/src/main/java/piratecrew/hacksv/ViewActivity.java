@@ -1,13 +1,20 @@
 package piratecrew.hacksv;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import piratecrew.hacksv.utils.Server;
+import piratecrew.hacksv.utils.WebResponderI;
 
-public class ViewActivity extends AppCompatActivity {
+
+public class ViewActivity extends AppCompatActivity implements WebResponderI {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +26,8 @@ public class ViewActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+
     }
 
     @Override
@@ -38,5 +47,21 @@ public class ViewActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public Bitmap StringToBitMap(String encodedString) { // method t convert string to bitmap
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
+    @Override
+    public void onWebResponse(String result) {
+
     }
 }

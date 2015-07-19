@@ -32,8 +32,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Runnable;
 import piratecrew.hacksv.utils.Server;
+import piratecrew.hacksv.utils.WebResponderI;
 
-public class CreateActivity extends AppCompatActivity implements Runnable{
+public class CreateActivity extends AppCompatActivity implements Runnable, WebResponderI {
 
     int requestCodeRun, resultCodeRun;
     Button create;
@@ -47,6 +48,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
     Uri selectedImage;
     ImageButton top;
     ImageButton bottom;
+    WebResponderI wr;
 
     @Override
     public void run() {
@@ -139,6 +141,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        wr = this;
 
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay()
@@ -187,7 +190,7 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
                 if (textTop.getText().toString().equals("") || textBottom.getText().toString().equals("") || textCenter.getText().toString().equals("")) {
                     showToast("Must fill in all fields.");
                 } else {
-                    Server.createPoll(textTop.getText().toString(), textBottom.getText().toString(), textCenter.getText().toString(), emailText.getText().toString(), bit1, bit2);
+                    Server.createPoll(textTop.getText().toString(), textBottom.getText().toString(), textCenter.getText().toString(), emailText.getText().toString(), bit1, bit2,wr);
                 }
             }
         });
@@ -261,4 +264,9 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
     }
 
 
+    @Override
+    public void onWebResponse(String result) {
+        Toast.makeText(getApplicationContext(),result,Toast.LENGTH_SHORT).show();
+        if (!result.equals("Server Error")) startActivity(new Intent(CreateActivity.this,BranchActivity.class));
+    }
 }

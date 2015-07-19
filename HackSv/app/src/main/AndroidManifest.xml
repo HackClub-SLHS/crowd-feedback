@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="piratecrew.hacksv"
-    >
+    package="piratecrew.hacksv" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:theme="@style/AppTheme"
-        android:largeHeap="true">
+        android:name="io.branch.referral.BranchApp">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -32,6 +34,15 @@
             android:name=".ViewActivity"
             android:label="@string/title_activity_view" >
         </activity>
+        <activity
+            android:name=".BranchActivity"
+            android:label="@string/title_activity_branch" >
+        </activity>
+        <!-- Other keys like icon and label -->
+\        <!-- Other existing entries -->
+
+        <!-- Add this meta-data below -->
+        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_bdoPnAHyJltVRAlqYZ3JZgcnrqd3vwvV"/>
     </application>
 
 </manifest>
