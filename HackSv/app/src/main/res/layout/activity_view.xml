@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="piratecrew.hacksv.ViewActivity">
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/secondImage"
+        android:src="@drawable/jeb"
+        android:layout_below="@+id/question"
+        android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/firstImage"
+        android:src="@drawable/trump"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/question" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Who will you vote for US President of 2016?"
+        android:id="@+id/question"
+        android:textColor="#ff000000"
+        android:textStyle="bold"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Donald Trump"
+        android:id="@+id/firstOption"
+        android:textStyle="bold"
+        android:textColor="#fffffb00"
+        android:layout_alignTop="@+id/firstImage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="107dp"
+        android:textColorHighlight="#ff000000"
+        android:background="#ff000000" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Jeb Bush"
+        android:id="@+id/secondOption"
+        android:textStyle="bold"
+        android:textColor="#fffffb00"
+        android:textColorHighlight="#ff000000"
+        android:layout_marginBottom="60dp"
+        android:layout_alignBottom="@+id/secondImage"
+        android:layout_centerHorizontal="true"
+        android:background="#ff000000" />
+
+</RelativeLayout>

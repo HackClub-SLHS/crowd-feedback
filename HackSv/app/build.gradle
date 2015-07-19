@@ -7,9 +7,9 @@ android {
     defaultConfig {
         applicationId "piratecrew.hacksv"
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 19
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
     }
     buildTypes {
         release {

@@ -16,6 +16,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button createAct = (Button) findViewById(R.id.buttonCreate);
+        Button voteAct = (Button) findViewById(R.id.buttonVote);
+        voteAct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ViewActivity.class));
+            }
+        });
+        createAct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CreateActivity.class));
+            }
+        });
+
     }
 
     @Override
