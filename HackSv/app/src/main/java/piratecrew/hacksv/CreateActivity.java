@@ -21,14 +21,14 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.lang.Runnable;
-import piratecrew.hacksv.util.Server;
+import piratecrew.hacksv.utils.Server;
 
 public class CreateActivity extends AppCompatActivity implements Runnable{
 
     int requestCodeRun, resultCodeRun;
     Intent dataRun;
     Button create;
-    EditText textTop, textCenter, textBottom;
+    EditText textTop, textCenter, textBottom, emailText;
     Bitmap bit1, bit2;
     Bundle extras;
     int imageToSet;
@@ -92,13 +92,13 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         }
         if (imageToSet == R.id.imageViewTop){
             bit1 = bitmap;
-            bitmap.recycle();
+            //bitmap.recycle();
             selectImage(R.id.imageViewBottom, false);
         }
         else{
             bit2 = bitmap;
-            bitmap.recycle();
-            Server.createPoll(textCenter.getText(),textTop.getText(),textBottom.getText(),bit1,bit2);
+            //bitmap.recycle();
+            Server.createPoll(textTop.getText().toString(), textBottom.getText().toString(),textCenter.getText().toString(),emailText.getText().toString(), bit1, bit2);
         }
          Log.i("Running", "Thread is running");
     }
@@ -121,19 +121,20 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         textTop = (EditText) findViewById(R.id.editTextTop);
         textBottom = (EditText) findViewById(R.id.editTextBottom);
         textCenter = (EditText) findViewById(R.id.editTextCenter);
+        emailText = (EditText) findViewById(R.id.editTextemail);
         create = (Button) findViewById(R.id.create);
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Turn the time into milliseconds
-                long time = 60_000 * (10 + 60 * (0 + 24 * 0));
+                //long time = 60_000 * (10 + 60 * (0 + 24 * 0));
 
                 //TODO add additional verification for text boxes
                 if (textTop.getText().toString().equals("") || textBottom.getText().toString().equals("") || textCenter.getText().toString().equals("")) {
                     showToast("Must describe both options and add question.");
                 } else {
                     selectImage(R.id.imageViewTop, true);
-
+                    Server.createPoll(textTop.getText().toString(), textBottom.getText().toString(), textCenter.getText().toString(), emailText.getText().toString(), bit1, bit2);
                 }
             }
         });

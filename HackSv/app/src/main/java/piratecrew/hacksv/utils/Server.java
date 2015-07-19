@@ -4,7 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
-
+import android.util.Log;
+import android.widget.Toast;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -15,7 +16,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,7 @@ public class Server {
 
     static private final String WEB_ROOT = "https://hacksv-server-xeonjake.c9.io/";
 
-    public void createPoll(String question,String text1, String text2, Bitmap pic1, Bitmap pic2){ //method to create a poll
+    public static void createPoll(String text1, String text2,String question,String email, Bitmap pic1, Bitmap pic2){ //method to create a poll
 
         String[] host = {WEB_ROOT+"create_poll.php"};
         String[] qus = {"qus", question};
@@ -42,11 +42,13 @@ public class Server {
         else{sPic1 = BitMapToString(pic1); sPic2 =BitMapToString(pic2);}
         String[] bit1 = {"pic1", sPic1};
         String[] bit2 = {"pic2", sPic2};
+        String[] mail = {"email", email};
 
-        new SendPostRequest().execute(host,qus,opt1, opt2, bit1, bit2);
+        new SendPostRequest().execute(host, opt1, opt2, qus, mail, bit1, bit2);
+
     }
 
-    public String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
+    public static String BitMapToString(Bitmap bitmap){ // method to convert bitmap to string
         ByteArrayOutputStream byteOutRiver = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutRiver);
         byte [] b=byteOutRiver.toByteArray();
@@ -73,7 +75,6 @@ public class Server {
                 HttpPost httpPost = new HttpPost();
 
                 httpPost.setURI(new URI(params[0][0]));
-
 
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(params.length - 1);
                 for (int i = 1; i < params.length; i++) {
@@ -111,6 +112,7 @@ public class Server {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+
             return null; //If program gets this far, something didn't work.
         }
     }
