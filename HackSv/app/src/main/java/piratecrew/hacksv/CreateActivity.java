@@ -53,6 +53,12 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
         bitmap = null;
         if (resultCodeRun == RESULT_OK) {
             if (requestCodeRun ==1) {   //took a photo
+                if (imageToSet == top){
+                    bit1 = null;
+                }
+                else{
+                    bit2 = null;
+                }
                 bitmap = Bitmap.createScaledBitmap((Bitmap) extras.get("data"), (int) (width * ((((Bitmap) extras.get("data")).getWidth() * height * .29) / (((Bitmap) extras.get("data")).getHeight() * width))), (int) (height * .29), false);
                     imageToSet.setImageBitmap(bitmap);
 
@@ -78,6 +84,13 @@ public class CreateActivity extends AppCompatActivity implements Runnable{
 
             }
             else if (requestCodeRun == 2) {    //choose photo
+
+                if (imageToSet == top){
+                    bit1 = null;
+                }
+                else{
+                    bit2 = null;
+                }
 
                 String[] filePathColumn = { MediaStore.Images.Media.DATA };
                 Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
