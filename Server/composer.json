@@ -1,0 +1,5 @@
+{
+    "require": {
+        "sparkpost/php-sparkpost": "^0.1.1"
+    }
+}
